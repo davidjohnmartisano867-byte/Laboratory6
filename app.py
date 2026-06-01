@@ -35,7 +35,6 @@ with tab1:
     st.header("AI-Assisted Document Classification Module")
     st.write("Automatically categorizes uploaded text or documents into their corresponding ISO Clauses.")
     
-    # Text input field for document sample
     doc_input = st.text_area(
         "Enter excerpt or title of the ISO Document (SOP, Manual, or Report):",
         placeholder="e.g., Standard operating procedure for risk management assessment and hazard mitigation plans.",
@@ -46,7 +45,6 @@ with tab1:
         if doc_input.strip() == "":
             st.warning("Please enter some document text or content to classify.")
         elif class_model and vectorizer:
-            # Vectorize the input text and make a prediction
             vectorized_text = vectorizer.transform([doc_input])
             prediction = class_model.predict(vectorized_text)[0]
             
@@ -62,7 +60,6 @@ with tab2:
     st.header("Predictive Analytics: Future Audit Risk Forecasting")
     st.write("Estimates the total number of potential non-conformities or findings in the next audit cycle based on historical performance data.")
     
-    # Layout using columns for structured data entry
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -74,17 +71,14 @@ with tab2:
 
     if st.button("Run Predictive Model"):
         if reg_model:
-            # Map input features to a 2D array for the scikit-learn regression model
             input_features = np.array([[past_gaps, unresolved_tasks, personnel_count]])
             prediction_reg = reg_model.predict(input_features)[0]
             
-            # Format and round the predicted continuous numerical value
             final_pred = max(0, round(prediction_reg, 1))
             
             st.write("---")
             st.metric(label="Predicted Potential Audit Issues / Findings", value=f"{final_pred} findings")
             
-            # Contextual feedback based on risk level
             if final_pred > 5:
                 st.error("⚠️ **High Risk Warning:** The model forecasts a significant amount of potential audit findings. It is highly recommended to prioritize and resolve pending Corrective Action Plans (CAP) immediately.")
             else:
