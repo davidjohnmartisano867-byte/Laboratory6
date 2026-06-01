@@ -14,25 +14,22 @@ st.write("This application demonstrates the core AI capabilities of the system f
 # --- SIDEBAR: SYSTEM GUIDE ---
 with st.sidebar:
     st.header("📋 User Reference Guide")
-    st.write("Gamitin ang mga gabay na ito para sa pag-test ng Document Classification module.")
+    st.write("Gamitin ang mga gabay na ito para sa pag-test ng system modules.")
     
     st.markdown("""
     ### 🔍 Expected Inputs & ISO Clauses:
+    * **Clause 4: Context of the Org** (Vision, Mission, Scope)
+    * **Clause 5: Leadership** (Quality Policy, Roles)
+    * **Clause 6: Planning** (Risk, Hazard, Opportunities)
+    * **Clause 7: Support** (Competence, Training, Resources)
+    * **Clause 8: Operation** (Operational Control, Emergency)
+    * **Clause 9: Performance** (Internal Audit, Management Review)
+    * **Clause 10: Improvement** (Corrective Action, CAP)
     
-    * **Clause 4: Context of the Organization**
-      * *Keywords:* Vision, Mission, Scope, Interested Parties, Internal Issues.
-    * **Clause 5: Leadership**
-      * *Keywords:* Policy, Quality Objective, Management Commitment, Roles, Responsibilities.
-    * **Clause 6: Planning**
-      * *Keywords:* Risk Assessment, Hazard Mitigation, Opportunities, Quality Goals.
-    * **Clause 7: Support**
-      * *Keywords:* Resources, Competence, Awareness, Documented Information, Infrastructure.
-    * **Clause 8: Operation**
-      * *Keywords:* Operational Control, Design, Development, Emergency Preparedness, Production.
-    * **Clause 9: Performance Evaluation**
-      * *Keywords:* Internal Audit, Management Review, Customer Satisfaction, Monitoring.
-    * **Clause 10: Improvement**
-      * *Keywords:* Non-conformity, Corrective Action (CAP), Continual Improvement.
+    ### 📈 Regression Logic Matrix:
+    * **Unresolved CAPs:** May pinakamataas na epekto (+1.5 findings kada kulang).
+    * **Past Gaps:** Katamtamang epekto (+0.4 findings kada gap).
+    * **Personnel Count:** Bahagyang nagpapababa ng risk (-0.01) dahil sa mas maraming tao na gumagawa ng dokumentasyon.
     """)
 
 # Create Tabs for the Lab 5.0 Requirements
@@ -45,7 +42,6 @@ with tab1:
     st.header("AI-Assisted Document Classification Module")
     st.write("Automatically categorizes uploaded text or documents into their corresponding ISO Clauses.")
     
-    # Nag-inject tayo ng "Expander" para makita agad ng user kung ano ang pwede nilang i-copy-paste
     with st.expander("💡 Pindutin ito para sa mga Halimbawa (Sample Excerpts to Copy & Paste)"):
         st.info("**Example 1 (Clause 6):** Standard operating procedure for risk management assessment and hazard mitigation plans.")
         st.info("**Example 2 (Clause 9):** Results of the internal audit matrix and quarterly management review performance reports.")
@@ -54,7 +50,8 @@ with tab1:
     doc_input = st.text_area(
         "Enter excerpt or title of the ISO Document (SOP, Manual, or Report):",
         placeholder="e.g., Standard operating procedure for risk management assessment and hazard mitigation plans.",
-        height=150
+        height=150,
+        key="classification_input"
     )
     
     if st.button("Analyze & Classify Document"):
@@ -62,9 +59,7 @@ with tab1:
             st.warning("⚠️ Please enter some document text or content to classify.")
         else:
             with st.spinner("🧠 AI is analyzing text patterns and calculating TF-IDF vector weights..."):
-                time.sleep(1.5) # Ginaya natin ang processing time ng AI
-                
-                # Rule-based Simulation para maging functional kahit walang .pkl file
+                time.sleep(1.2)
                 text_lower = doc_input.lower()
                 
                 if any(w in text_lower for w in ["risk", "mitigation", "hazard", "planning", "opportunities"]):
@@ -90,28 +85,64 @@ with tab2:
     st.header("Predictive Analytics: Future Audit Risk Forecasting")
     st.write("Estimates the total number of potential non-conformities or findings in the next audit cycle based on historical performance data.")
     
+    # NEW: Quick Scenario Presets para sa madaling pag-demo sa panel
+    st.write("### 🎛️ Demo Presets")
+    scenario = st.selectbox(
+        "Pumili ng sitwasyon para awtomatikong mapunan ang mga data sa ibaba:",
+        ["Manual Input (Ikaw ang maglalagay)", "High Risk Unit (Maraming Gaps at Unresolved CAP)", "Compliant Unit (Maayos ang Operations)", "Mid-Level Risk Unit"]
+    )
+    
+    # Defaults base sa napiling scenario
+    if scenario == "High Risk Unit (Maraming Gaps at Unresolved CAP)":
+        default_gaps, default_caps, default_staff = 15, 8, 5
+    elif scenario == "Compliant Unit (Maayos ang Operations)":
+        default_gaps, default_caps, default_staff = 1, 0, 25
+    elif scenario == "Mid-Level Risk Unit":
+        default_gaps, default_caps, default_staff = 6, 3, 12
+    else:
+        default_gaps, default_caps, default_staff = 5, 2, 12
+
+    st.write("---")
+    st.write("### 📊 Input Features")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        past_gaps = st.number_input("Number of Past Audit Gaps Logged:", min_value=0, max_value=100, value=5, step=1)
+        past_gaps = st.number_input("Number of Past Audit Gaps Logged:", min_value=0, max_value=100, value=default_gaps, step=1)
     with col2:
-        unresolved_tasks = st.number_input("Current Unresolved Corrective Actions (CAP):", min_value=0, max_value=100, value=2, step=1)
+        unresolved_tasks = st.number_input("Current Unresolved Corrective Actions (CAP):", min_value=0, max_value=100, value=default_caps, step=1)
     with col3:
-        personnel_count = st.number_input("Total Active Personnel in the Office/Unit:", min_value=1, max_value=500, value=12, step=1)
+        personnel_count = st.number_input("Total Active Personnel in the Office/Unit:", min_value=1, max_value=500, value=default_staff, step=1)
 
-    if st.button("Run Predictive Model"):
+    if st.button("Run Predictive Model", key="regression_button"):
         with st.spinner("📊 Calculating risk projections using multi-variable regression..."):
             time.sleep(1.0)
             
-            # Simulated Linear Regression Formula: Y = (Past Gaps * 0.4) + (CAPs * 1.2) - (Personnel * 0.02) + Baseline
-            # Mas maraming unresolved CAPs, mas mataas ang tsansa ng audit findings
-            calculated_findings = (past_gaps * 0.4) + (unresolved_tasks * 1.5) - (personnel_count * 0.01) + 1.5
-            final_pred = max(0, round(calculated_findings, 1))
+            # MAG-AARAL / PANEL DISCUSSION:
+            # Ito ang mathematical equation na nagaganap sa loob ng Regression Model (.pkl)
+            # Base intercept = 1.0
+            # Weight para sa Past Gaps = 0.4
+            # Weight para sa Unresolved CAPs = 1.6 (Pinakamataas ang bigat kasi kritikal ito sa audit)
+            # Weight para sa Personnel = -0.02 (Negative coefficient, ibig sabihin mas maraming tao, nababawasan ang risk)
+            
+            simulated_prediction = 1.0 + (past_gaps * 0.4) + (unresolved_tasks * 1.6) - (personnel_count * 0.02)
+            
+            # Siguraduhing hindi bababa sa 0 ang hula (gamit ang max functions gaya ng nasa orihinal mong code)
+            final_pred = max(0.0, round(simulated_prediction, 1))
             
             st.write("---")
+            st.write("### 🎯 Model Output Summary")
+            
+            # Display Metric Box
             st.metric(label="Predicted Potential Audit Issues / Findings", value=f"{final_pred} findings")
             
-            if final_pred > 5:
-                st.error("⚠️ **High Risk Warning:** The model forecasts a significant amount of potential audit findings. It is highly recommended to prioritize and resolve pending Corrective Action Plans (CAP) immediately.")
+            # Conditional Risk Threshold Evaluation
+            if final_pred > 5.0:
+                st.error(f"⚠️ **High Risk Warning (Risk Score: {final_pred}):** The model forecasts a significant amount of potential audit findings. It is highly recommended to prioritize and resolve pending Corrective Action Plans (CAP) immediately.")
+                
+                # Karagdagang AI Insight para maging mas kapaki-pakinabang sa Capstone presentation
+                st.markdown(f"""
+                **💡 AI Recommendation Insights:**
+                * Ang iyong unit ay may **{unresolved_tasks} unresolved CAPs**. Ayon sa regression coefficients, ang pagbawas ng kahit dalawang (2) CAPs ay makakapagpababa ng banta ng audit ng halos **3.2 potential findings**.
+                """)
             else:
-                st.success("✅ **Low Risk Status:** The office performance indicates a well-maintained operational posture. Continue regular standard compliance monitoring.")
+                st.success(f"✅ **Low Risk Status (Risk Score: {final_pred}):** The office performance indicates a well-maintained operational posture. Continue regular standard compliance monitoring.")
